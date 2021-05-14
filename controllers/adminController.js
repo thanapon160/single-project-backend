@@ -7,7 +7,6 @@ require('dotenv').config();
 exports.addUser = async (req, res, next) => {
   const transaction = await sequelize.transaction();
   const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-
   try {
     const { email, password, firstName, lastName, confirmPassword, position, mobile } = req.body
     console.log(req.body)
@@ -56,6 +55,19 @@ exports.userList = async (req, res, next) => {
       delete user.dataValues.profileImg
       return user;
     })
+    res.status(200).json({ message: 'request success', result })
+  } catch (err) {
+    next(err)
+  }
+};
+exports.userById = async (req, res, next) => {
+  try {
+    const {id} = req.params;
+    const result = await User.findOne({
+      where: { id } ,
+      attributes:['id', 'firstName', 'lastName', 'mobile', 'isActive'],
+      include: { model: Position, attributes: ['name',] }, 
+    });
     res.status(200).json({ message: 'request success', result })
   } catch (err) {
     next(err)
